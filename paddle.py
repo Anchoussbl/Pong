@@ -1,25 +1,29 @@
-from screen import *
+import direction
+from constants import HEIGHT
 class Paddle:
+    width = 20
+    height = 120
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.speed = 0
+
+    def stop_moving(self):
+        self.speed = 0
+
+    def start_moving(self, d):
+        if d == direction.Up:
+            self.speed = -1.7
+        else:
+            self.speed = 1.7
 
     def move(self):
-        pass
+        self.y += self.speed
+        if self.y + self.height > HEIGHT:
+            self.y = HEIGHT - self.height
+        if self.y < 0:
+            self.y = 0
 
-        # if self.paddle_y >= HEIGHT - paddle_height:
-        #     self.paddle_y = HEIGHT - paddle_height
-        # if self.paddle_y <= 0:
-        #     self.paddle_y = 0
-        # if self.paddle_y1 >= HEIGHT - paddle_height:
-        #     self.paddle_y1 = HEIGHT - paddle_height
-        # if self.paddle_y1 <= 0:
-        #     self.paddle_y1 = 0
 
-        # if paddle_X <= ball_x <= paddle_X + paddle_width:
-        #     if paddle_y <= ball_y <= paddle_y + paddle_height:
-        #         ball_x = paddle_X
-        #         vel_x *= -1
-        #
-        # if paddle_x <= ball_x <= paddle_x + paddle_width:
-        #     if paddle_y1 <= ball_y <= paddle_y1 + paddle_height:
-        #         ball_x = paddle_x + paddle_width
-        #         vel_x *= -1
 
