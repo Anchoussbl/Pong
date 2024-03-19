@@ -16,6 +16,8 @@ class Game:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.reset()
+        self.score1 = 0
+        self.score2 = 0
 
     def run(self):
         time_elapsed = 0
@@ -35,11 +37,6 @@ class Game:
                             self.left_paddle.start_moving(direction.Down)
                         elif event.key == pygame.K_w:
                             self.left_paddle.start_moving(direction.Up)
-                        # ускорение мячика
-                        # if event.key == pygame.K_RIGHT and g_left > 0:
-                        #     self.gad = 1
-                        # if event.key == pygame.K_d and G_left > 0:
-                        #     self.act = 1
                         if event.key == pygame.K_ESCAPE:
                             self.state = GameState.Pause
                     elif self.state == GameState.Menu:
@@ -88,65 +85,42 @@ class Game:
 
     def tick(self):
         self.handle_movement()
+        self.check_up_down()
+        self.check_right_paddle()
+        self.check_left_paddle()
+        self.check_walls()
 
     def handle_movement(self):
         self.left_paddle.move()
         self.right_paddle.move()
-        # ball's movement controls
-        # if (ball_y <= 0 + radius) or (ball_y >= HEIGHT - radius):
-        #     vel_y *= -1
-        # if ball_x >= WIDTH - radius:
-        #     ball_x = WIDTH / 2 - radius
-        #     ball_y = HEIGHT / 2 - radius
-        #     vel_x = 0.5
-        #     vel_y = 0.5
-        #     vel_x *= -1
-        # if ball_x <= 0 + radius:
-        #     ball_x = WIDTH / 2 - radius
-        #     ball_y = HEIGHT / 2 - radius
-        #     vel_x = 0.5
-        #     vel_y = 0.5
-        #
-        #     # paddle's movement controls
-        # if paddle_y >= HEIGHT - paddle_height:
-        #     paddle_y = HEIGHT - paddle_height
-        # if paddle_y <= 0:
-        #     paddle_y = 0
-        # if paddle_y1 >= HEIGHT - paddle_height:
-        #     paddle_y1 = HEIGHT - paddle_height
-        # if paddle_y1 <= 0:
-        #     paddle_y1 = 0
-        #
-        # if paddle_X <= ball_x <= paddle_X + paddle_width:
-        #     if paddle_y <= ball_y <= paddle_y + paddle_height:
-        #         ball_x = paddle_X
-        #         vel_x *= -1
-        #
-        # if paddle_x <= ball_x <= paddle_x + paddle_width:
-        #     if paddle_y1 <= ball_y <= paddle_y1 + paddle_height:
-        #         ball_x = paddle_x + paddle_width
-        #         vel_x *= -1
-        #
-        #         # gadget movement controls
-        # if gad == 1:
-        #     if paddle_X <= ball_x <= paddle_X + paddle_width:
-        #         if paddle_y <= ball_y <= paddle_y + paddle_height:
-        #             ball_x = paddle_X
-        #             vel_x *= -3.5
-        #             gad = 0
-        #
-        # if act == 1:
-        #     if paddle_x <= ball_x <= paddle_x + paddle_width:
-        #         if paddle_y1 <= ball_y <= paddle_y1 + paddle_height:
-        #             ball_x = paddle_x + paddle_width
-        #             vel_x *= -3.5
-        #             act = 0
-        #
-        #             # raw movements
-        # paddle_y += paddle_vel
-        # paddle_y1 += paddle_vel1
-        # ball_x += vel_x
-        # ball_y += vel_y
+
+    def check_up_down(self):
+        if (self.ball.y <= 0 + self.ball.radius) or (self.ball.y >= HEIGHT - self.ball.radius):
+            self.ball.speed_y = - self.ball.speed_y
+        self.ball.x += self.ball.speed_x
+        self.ball.y += self.ball.speed_y
+
+    def check_right_paddle(self):
+        rect = pygame.Rect(self.right_paddle.x, self.right_paddle.y, Paddle.width, Paddle.height)
+        if rect.collidepoint(self.ball.x + self.ball.radius, self.ball.y):
+            self.ball.speed_x = - self.ball.speed_x
+        self.ball.x += self.ball.speed_x
+        self.ball.y += self.ball.speed_y
+
+    def check_left_paddle(self):
+        rect = pygame.Rect(self.left_paddle.x, self.left_paddle.y, Paddle.width, Paddle.height)
+        if rect.collidepoint(self.ball.x - self.ball.radius, self.ball.y):
+            self.ball.speed_x = - self.ball.speed_x
+        self.ball.x += self.ball.speed_x
+        self.ball.y += self.ball.speed_y
+
+    def check_walls(self):
+        if self.ball.x <= 0 + self.ball.radius:
+            self.score2 += 1
+            self.ball = Ball(WIDTH, HEIGHT, 15)
+        elif self.ball.x >= WIDTH - self.ball.radius:
+            self.score1 += 1
+            self.ball = Ball(WIDTH, HEIGHT, 15)
 
     def handle_menu(self):
         self.menu.show(self)
@@ -173,10 +147,5 @@ class Game:
         self.record = Record()
         self.gameover = GameOver()
         self.state = GameState.Menu
-        self.speed = 1
-        self.score1 = 0
-        self.score2 = 0
-
-
-
+        self.speed = 10
 
