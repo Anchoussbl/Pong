@@ -66,7 +66,6 @@ class Game:
                         self.left_paddle.stop_moving()
 
             if time_elapsed > self.speed:
-                # Обновляем логику игры
                 if self.state == GameState.Running:
                     self.tick()
                     time_elapsed = 0
@@ -144,7 +143,6 @@ class Game:
         self.state = GameState.GameOver
 
     def quit(self):
-        # НЕ СОХРАНЯЕТСЯ РЕКОРД ПОСЛЕ ВЫХОДА ИЗ ИГРЫ
         self.database.store({"Player1": self.rec1, "Player2": self.rec2})
         self.running = False
 

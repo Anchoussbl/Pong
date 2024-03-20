@@ -17,11 +17,9 @@ class Screen:
                                                         Paddle.width, Paddle.height))
 
     def reset(self):
-        # Заливаем черным
         self.display.fill(BLACK)
 
     def update(self):
-        # После отрисовки всего, отображаем
         pygame.display.update()
 
     def draw_text(self, text, x=WIDTH / 2, y=10, color=WHITE):
