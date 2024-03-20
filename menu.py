@@ -3,7 +3,7 @@ from game_state import *
 class Menu(Window):
     def __init__(self):
         self.entries = {"Start": self.begin_game,
-                        "My record": self.record,
+                        "Record": self.record,
                         "Exit": self.exit}
         super(Menu, self).__init__()
 

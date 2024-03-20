@@ -4,9 +4,8 @@ from constants import *
 from menu import *
 from pause import *
 from record import *
-from gameover import *
 from game_state import *
-# from database import *
+from database import *
 
 
 class Game:
@@ -15,7 +14,21 @@ class Game:
     def __init__(self):
         pygame.init()
         self.clock = pygame.time.Clock()
-        self.reset()
+        self.screen = Screen()
+        self.ball = Ball(WIDTH, HEIGHT, 15)
+        self.left_paddle = Paddle(100 - Paddle.width / 2,
+                                  HEIGHT / 2 - Paddle.height / 2)
+        self.right_paddle = Paddle(WIDTH - (100 - Paddle.width / 2),
+                                   HEIGHT / 2 - Paddle.height / 2)
+        self.state = GameState.Menu
+        self.speed = 10
+        self.menu = Menu()
+        self.pause = Pause()
+        self.record = Record()
+        self.database = DataBase()
+        data = self.database.load()
+        self.rec1 = data["Player1"] if data else 0
+        self.rec2 = data["Player2"] if data else 0
         self.score1 = 0
         self.score2 = 0
 
@@ -45,8 +58,6 @@ class Game:
                         self.pause.handle_press(self, event.key)
                     elif self.state == GameState.Record:
                         self.record.handle_press(self, event.key)
-                    elif self.state == GameState.GameOver:
-                        self.gameover.handle_press(self, event.key)
 
                 elif event.type == pygame.KEYUP:
                     if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
@@ -65,7 +76,7 @@ class Game:
                 self.screen.draw_ball(self.ball)
                 self.screen.draw_paddles(self.left_paddle, self.right_paddle)
                 self.screen.draw_text(str(f"{self.score1} : {self.score2}"))
-                # self.screen.draw_text(str("record: {}".format(self.rec)), x=80, y=10)
+                self.screen.draw_text(str("record: {} : {}".format(self.rec1, self.rec2)), x=80, y=10)
                 self.screen.update()
             elif self.state == GameState.Menu:
                 # show menu
@@ -76,9 +87,6 @@ class Game:
             elif self.state == GameState.Record:
                 # show record
                 self.record.show(self)
-            elif self.state == GameState.GameOver:
-                # show game over
-                self.gameover.show(self)
 
         if not self.running:
             self.game_over()
@@ -117,9 +125,13 @@ class Game:
     def check_walls(self):
         if self.ball.x <= 0 + self.ball.radius:
             self.score2 += 1
+            if self.score2 > self.rec2:
+                self.rec2 += 1
             self.ball = Ball(WIDTH, HEIGHT, 15)
         elif self.ball.x >= WIDTH - self.ball.radius:
             self.score1 += 1
+            if self.score1 > self.rec1:
+                self.rec1 += 1
             self.ball = Ball(WIDTH, HEIGHT, 15)
 
     def handle_menu(self):
@@ -132,7 +144,8 @@ class Game:
         self.state = GameState.GameOver
 
     def quit(self):
-        # self.database.store({"Player1": self.rec})
+        # НЕ СОХРАНЯЕТСЯ РЕКОРД ПОСЛЕ ВЫХОДА ИЗ ИГРЫ
+        self.database.store({"Player1": self.rec1, "Player2": self.rec2})
         self.running = False
 
     def reset(self):
@@ -142,10 +155,9 @@ class Game:
                                   HEIGHT / 2 - Paddle.height / 2)
         self.right_paddle = Paddle(WIDTH - (100 - Paddle.width / 2),
                                    HEIGHT / 2 - Paddle.height / 2)
-        self.menu = Menu()
-        self.pause = Pause()
-        self.record = Record()
-        self.gameover = GameOver()
         self.state = GameState.Menu
+        self.score1 = 0
+        self.score2 = 0
         self.speed = 10
+
 

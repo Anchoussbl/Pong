@@ -1,5 +1,5 @@
 import pygame
-from screen import WIDTH, GREY, WHITE, RED
+from constants import WIDTH, GREY, WHITE, RED
 
 
 class Window(object):
